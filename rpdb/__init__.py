@@ -13,6 +13,7 @@ from functools import partial
 
 DEFAULT_ADDR = "127.0.0.1"
 DEFAULT_PORT = 4444
+DEFAULT_STDIN_PARAMS = {'encoding': 'utf8'}
 
 
 class FileObjectWrapper(object):
@@ -32,7 +33,7 @@ class FileObjectWrapper(object):
 
 class Rpdb(pdb.Pdb):
 
-    def __init__(self, addr=DEFAULT_ADDR, port=DEFAULT_PORT):
+    def __init__(self, addr=DEFAULT_ADDR, port=DEFAULT_PORT, stdin_params=DEFAULT_STDIN_PARAMS):
         """Initialize the socket and initialize pdb."""
 
         # Backup stdin and stdout before replacing them by the socket handle
@@ -59,6 +60,7 @@ class Rpdb(pdb.Pdb):
                          stdin=FileObjectWrapper(handle, self.old_stdin),
                          stdout=FileObjectWrapper(handle, self.old_stdin))
         sys.stdout = sys.stdin = handle
+        sys.stdin.update(stdin_params)
         self.handle = handle
         OCCUPIED.claim(port, sys.stdout)
 
